@@ -1,5 +1,6 @@
 from datastructure import datastructure
 
+
 @datastructure
 class WalletRiskPortfolio:
     pass

@@ -1,23 +1,57 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+
+import requests
 
 app = FastAPI(title="Crypto Portfolio Risk Checker")
 
-@get("/wallet/{wallet_address}")
-def get_wallet_risk(wallet_address: str):
-  risk_score = calculate_wallet_risk(wallet_address)
-  return {}
-  # return {
-  #   "wallet_address": wallet_address, 
-  #   "": value of portfolio 
-  #   % risk
-  #   diversification metric
-  #   "risk_score": risk_score
-  # }
- 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173/",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173/",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@post("/portfolio/get_risk")
-def get_portfolio_risk(portfolio: ListPortfolio):
-  risk_score = calculate_portfolio_risk(portfolio)
-  return {
-    "risk_score": risk_score
-  }
+COINGECKO_BASE = "https://api.coingecko.com/api/v3"
+
+
+# @app.get("/wallet/{wallet_address}")
+# def get_wallet_risk(wallet_address: str):
+#   # risk_score = calculate_wallet_risk(wallet_address)
+#   return {}
+
+
+
+# @app.post("/portfolio/get_risk")
+# def get_portfolio_risk(portfolio: ListPortfolio):
+#   risk_score = calculate_portfolio_risk(portfolio)
+#   return {
+#     "risk_score": risk_score
+#   }
+
+
+@app.get("/tickers")
+def get_ticker_suggestions(query: str = Query(..., min_length=2)):
+
+    response = requests.get(
+        f"{COINGECKO_BASE}/search",
+        params={"query": query}
+    )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="Failed to fetch tickers")
+
+    data = response.json()
+
+    suggestions = [
+        coin["id"]
+        for coin in data.get("coins", [])[:10]
+    ]
+
+    return suggestions
