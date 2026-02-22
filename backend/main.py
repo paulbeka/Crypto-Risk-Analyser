@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import requests
 
+from schemas import Portfolio
+from risk_analyser.risk_analyser import calculate_portfolio_risk
+
 app = FastAPI(title="Crypto Portfolio Risk Checker")
 
 app.add_middleware(
@@ -28,12 +31,12 @@ COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 
 
 
-# @app.post("/portfolio/get_risk")
-# def get_portfolio_risk(portfolio: ListPortfolio):
-#   risk_score = calculate_portfolio_risk(portfolio)
-#   return {
-#     "risk_score": risk_score
-#   }
+@app.post("/portfolio/get_risk")
+def get_portfolio_risk(portfolio: list[Portfolio]):
+  risk_score = calculate_portfolio_risk(portfolio)
+  return {
+    "risk_score": risk_score
+  }
 
 
 @app.get("/tickers")

@@ -1,5 +1,5 @@
 
 class Portfolio:
-    symbol: str
-    amount: float
+    crypto: str
+    allocation: float
     
