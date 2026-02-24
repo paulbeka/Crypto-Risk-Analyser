@@ -31,7 +31,7 @@ COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 
 
 
-@app.post("/portfolio/get_risk")
+@app.post("/analyse")
 def get_portfolio_risk(portfolio: list[Portfolio]):
   risk_score = calculate_portfolio_risk(portfolio)
   return {
