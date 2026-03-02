@@ -3,12 +3,12 @@ const BASE_URL = "http://localhost:8000";
 
 export const submitPortfolio = async (portfolio: { crypto: string; allocation: number }[]) => {
   try {
-    const response = await fetch(`${BASE_URL}/analyze`, {
+    const response = await fetch(`${BASE_URL}/analyse`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ portfolio }),
+        body: JSON.stringify(portfolio),
     });
 
     if (!response.ok) {

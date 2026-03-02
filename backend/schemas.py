@@ -1,5 +1,6 @@
+from pydantic import BaseModel
 
-class Portfolio:
+class Portfolio(BaseModel):
     crypto: str
     allocation: float
     
