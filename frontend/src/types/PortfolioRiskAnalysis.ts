@@ -1,0 +1,16 @@
+export type PortfolioRiskAnalysis = {
+    structure_risk: {
+        top1_concentration: number;
+        top3_concentration: number;
+        hhi_index: number;
+    };
+    liqidity_risk: {
+        liquidity_ratio: number;
+        low_liquidity_share: number;
+        worst_position_days: number;
+        weighted_avg_days: number;
+        p50_days: number;
+        p90_days: number;
+    };
+    risk_sensitivity: {};
+}
