@@ -13,15 +13,16 @@ function App() {
   const [portfolio, setPortfolio] = useState<PortfolioEntry[]>([
     { crypto: "bitcoin", allocation: 1 }
   ]);
-  // const [isOnInput, setIsOnInput] = useState(true);
-  const [isOnInput, setIsOnInput] = useState(false);
+  const [isOnInput, setIsOnInput] = useState(true);
 
   if (isOnInput) {
-    return <PortfolioInput 
-              portfolio={portfolio}
-              setPortfolio={setPortfolio}
-              setIsOnInput={setIsOnInput}
-            />;
+    return (
+      <PortfolioInput 
+        portfolio={portfolio}
+        setPortfolio={setPortfolio}
+        setIsOnInput={setIsOnInput}
+      />
+    );
   }
 
   return (

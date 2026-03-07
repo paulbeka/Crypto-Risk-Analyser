@@ -4,7 +4,7 @@ export type PortfolioRiskAnalysis = {
         top3_concentration: number;
         hhi_index: number;
     };
-    liqidity_risk: {
+    liquidity_risk: {
         liquidity_ratio: number;
         low_liquidity_share: number;
         worst_position_days: number;
@@ -13,4 +13,7 @@ export type PortfolioRiskAnalysis = {
         p90_days: number;
     };
     risk_sensitivity: {};
+    portfolio_value: number;
+    risk_score: number;
+    stress_test: number;
 }

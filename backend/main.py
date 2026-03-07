@@ -24,19 +24,15 @@ app.add_middleware(
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 
 
-# @app.get("/wallet/{wallet_address}")
-# def get_wallet_risk(wallet_address: str):
-#   # risk_score = calculate_wallet_risk(wallet_address)
-#   return {}
-
+# TODO: implement fetch from wallet chain
+@app.get("/wallet/{wallet_address}")
+def get_wallet_risk(wallet_address: str):
+  return {}
 
 
 @app.post("/analyse")
 def get_portfolio_risk(portfolio: list[Portfolio]):
-  risk_score = calculate_portfolio_risk(portfolio)
-  return {
-    "risk_score": risk_score
-  }
+  return calculate_portfolio_risk(portfolio)
 
 
 @app.get("/tickers")
