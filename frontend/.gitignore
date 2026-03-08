@@ -13,7 +13,7 @@ lerna-debug.log*
 # Node / Frontend
 # =========================
 node_modules
-dist
+# dist
 dist-ssr
 build
 .vite
@@ -44,7 +44,7 @@ ENV/
 # Python packaging
 build/
 develop-eggs/
-dist/
+# dist/
 downloads/
 eggs/
 .eggs/
