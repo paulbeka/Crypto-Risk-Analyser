@@ -29,6 +29,27 @@ import PaperCard from "../components/PaperCard";
 import { chartColors, dashboardBg, cardBg, borderColor, textPrimary, textSecondary } from '../theme/colors';
 
 
+const mockRiskResult: PortfolioRiskAnalysis = {
+  structure_risk: {
+    top1_concentration: 0.28,
+    top3_concentration: 0.55,
+    hhi_index: 0.19,
+  },
+  liquidity_risk: {
+    liquidity_ratio: 0.82,
+    low_liquidity_share: 0.12,
+    worst_position_days: 7,
+    weighted_avg_days: 2.4,
+    p50_days: 1.8,
+    p90_days: 5.6,
+  },
+  risk_sensitivity: {},
+  portfolio_value: 125000,
+  risk_score: 64,
+  stress_test: -0.11,
+};
+
+
 function formatCurrency(value: number | string | null | undefined): string {
   const num = Number(value ?? 0);
   if (!Number.isFinite(num)) return '$0.00';
@@ -153,7 +174,7 @@ function RiskProgress({
 
 
 const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
-  const [riskResult, setRiskResult] = useState<PortfolioRiskAnalysis | null>(null);
+  const [riskResult, setRiskResult] = useState<PortfolioRiskAnalysis | null>(mockRiskResult);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -385,7 +406,7 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
 
         <Grid size={{ xs: 12, lg: 6 }}>
           <PaperCard
-            title="Market / Headline Risk"
+            title="Aggregated Risk Score"
             minHeight={360}
             action={
               <Chip

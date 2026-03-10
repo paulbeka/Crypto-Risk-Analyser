@@ -21,13 +21,15 @@ def calculate_portfolio_risk(portfolio: list[Portfolio]) -> dict:
 
     portfolio_value = calculate_portfolio_value(portfolio, asset_data)
 
+    risk_score = get_risk_score(structure_risk, liquidity_risk, risk_sensitivity)
+
     return {
         "structure_risk": structure_risk,
         "liquidity_risk": liquidity_risk,
         "risk_sensitivity": risk_sensitivity,
         "portfolio_value": portfolio_value,
-        "risk_score": 0.5,
         "stress_test": 0.5,
+        "risk_score": risk_score,
     }
 
 
@@ -113,4 +115,33 @@ def calculate_portfolio_liquidity_risk(portfolio: list[Portfolio], asset_data: d
 
 
 def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
+    # here return the volatility per asset, the aggregate volatility
+    # VaR and CVaR
+    # Add some kind of market exposure ex how the portfolio moves with BTC
     return {}
+
+
+def calculate_stress_test_risk(portfolio, asset_data) -> dict:
+    # here create and run several different stress test scenarios
+    return {}
+
+
+def get_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> float:
+    structure_score = (
+        structure_risk["top1_concentration"] * 0.5
+        + structure_risk["top3_concentration"] * 0.3
+        + structure_risk["hhi_index"] * 0.2
+    )
+
+    liquidity_score = (
+        liquidity_risk["liquidity_ratio"] * 0.4
+        + liquidity_risk["low_liquidity_share"] * 0.3
+        + liquidity_risk["worst_position_days"] * 0.2
+        + liquidity_risk["weighted_avg_days"] * 0.1
+    )
+
+    risk_sensitivity_score = 0
+
+    total_score = structure_score * 0.4 + liquidity_score * 0.4 + risk_sensitivity_score * 0.2
+
+    return total_score
