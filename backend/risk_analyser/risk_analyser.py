@@ -115,10 +115,28 @@ def calculate_portfolio_liquidity_risk(portfolio: list[Portfolio], asset_data: d
 
 
 def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
+    asset_returns = {}
+    aggregated_return = 0
+
+    for asset in portfolio:
+        prices = asset_data[asset.crypto]["prices"]
+        returns = []
+        for i in range(1, len(prices)):
+            returns.append(prices[i] / prices[i-1])
+        asset_returns[asset] = sum(returns) / len(returns)
+        aggregated_return += asset_returns[asset] * portfolio[asset]
+        
+    
+    # run the monte carlo sim
+    # get VaR and CVaR
+
     # here return the volatility per asset, the aggregate volatility
     # VaR and CVaR
     # Add some kind of market exposure ex how the portfolio moves with BTC
-    return {}
+    return {
+        "asset_returns": asset_returns,
+        "aggregated_return": aggregated_return
+    }
 
 
 def calculate_stress_test_risk(portfolio, asset_data) -> dict:
