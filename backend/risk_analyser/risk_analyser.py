@@ -2,6 +2,7 @@ import numpy as np
 
 from schemas import Portfolio
 from .util import get_market_data
+from .risk_util import run_monte_carlo, VaR, CVaR, get_asset_return_data
 
 
 LIQ_THRESHOLD = 0.1
@@ -16,19 +17,17 @@ def calculate_portfolio_risk(portfolio: list[Portfolio]) -> dict:
 
     structure_risk = calculate_portfolio_structure_risk(portfolio)
     liquidity_risk = calculate_portfolio_liquidity_risk(portfolio, asset_data)
-
     risk_sensitivity = calculate_portfolio_risk_sensitivity(portfolio, asset_data)
-
     portfolio_value = calculate_portfolio_value(portfolio, asset_data)
-
-    risk_score = get_risk_score(structure_risk, liquidity_risk, risk_sensitivity)
+    stress_test = calculate_stress_test_risk(portfolio, asset_data)
+    risk_score = calculate_risk_score(structure_risk, liquidity_risk, risk_sensitivity)
 
     return {
         "structure_risk": structure_risk,
         "liquidity_risk": liquidity_risk,
         "risk_sensitivity": risk_sensitivity,
         "portfolio_value": portfolio_value,
-        "stress_test": 0.5,
+        "stress_test": stress_test,
         "risk_score": risk_score,
     }
 
@@ -118,33 +117,48 @@ def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
     asset_returns = {}
     aggregated_return = 0
 
+    total_allocation = sum(asset.allocation for asset in portfolio)
+    weights = []
+
     for asset in portfolio:
         prices = asset_data[asset.crypto]["prices"]
-        returns = []
-        for i in range(1, len(prices)):
-            returns.append(prices[i] / prices[i-1])
-        asset_returns[asset] = sum(returns) / len(returns)
-        aggregated_return += asset_returns[asset] * portfolio[asset]
-        
-    
-    # run the monte carlo sim
-    # get VaR and CVaR
 
-    # here return the volatility per asset, the aggregate volatility
-    # VaR and CVaR
-    # Add some kind of market exposure ex how the portfolio moves with BTC
+        returns = [
+            (prices[i] - prices[i-1]) / prices[i-1]
+            for i in range(1, len(prices))
+        ]
+
+        mean_return = sum(returns) / len(returns)
+
+        asset_returns[asset.crypto] = mean_return
+
+        weight = asset.allocation / total_allocation
+        weights.append(weight)
+
+        aggregated_return += mean_return * weight
+
+
+    mean_returns, cov_matrix, portfolio_value = get_asset_return_data(asset_data)
+
+    simulations = run_monte_carlo(weights, mean_returns, cov_matrix, portfolio_value)
+    var = VaR(simulations)
+    cvar = CVaR(simulations)
+
+    # TODO: Add some kind of market exposure ex how the portfolio moves with BTC
     return {
         "asset_returns": asset_returns,
-        "aggregated_return": aggregated_return
+        "aggregated_return": aggregated_return,
+        "var": var,
+        "cvar": cvar
     }
 
 
 def calculate_stress_test_risk(portfolio, asset_data) -> dict:
-    # here create and run several different stress test scenarios
+    # TODO: use different kind of stress test scenarios like BTC crash, DeFi crash, stablecoin crash etc
     return {}
 
 
-def get_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> float:
+def calculate_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> float:
     structure_score = (
         structure_risk["top1_concentration"] * 0.5
         + structure_risk["top3_concentration"] * 0.3
@@ -162,4 +176,4 @@ def get_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> float:
 
     total_score = structure_score * 0.4 + liquidity_score * 0.4 + risk_sensitivity_score * 0.2
 
-    return total_score
+    return total_score * 100

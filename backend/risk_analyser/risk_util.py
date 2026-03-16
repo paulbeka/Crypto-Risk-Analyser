@@ -29,3 +29,33 @@ def getVaRMetrics(initial_portfolio_value, returns, alpha=5):
         "VaR": initial_portfolio_value - VaR(returns, alpha=alpha),
         "CVaR": initial_portfolio_value - CVaR(returns, alpha=alpha)
     }
+
+
+def get_asset_return_data(asset_data):
+
+    assets = list(asset_data.keys())
+    returns_list = []
+
+    for asset in assets:
+        prices = asset_data[asset]["prices"]
+
+        returns = [
+            (prices[i] - prices[i-1]) / prices[i-1]
+            for i in range(1, len(prices))
+        ]
+
+        returns_list.append(returns)
+
+    min_len = min(len(r) for r in returns_list)
+    returns_list = [r[-min_len:] for r in returns_list]
+
+    returns_matrix = np.array(returns_list).T
+    mean_returns = np.mean(returns_matrix, axis=0)
+    cov_matrix = np.cov(returns_matrix, rowvar=False)
+
+    if np.ndim(cov_matrix) == 0:
+        cov_matrix = np.array([[cov_matrix]])
+
+    portfolio_value = sum(asset_data[a]["prices"][-1] for a in assets)
+
+    return mean_returns, cov_matrix, portfolio_value
