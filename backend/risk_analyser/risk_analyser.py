@@ -3,6 +3,7 @@ import numpy as np
 from schemas import Portfolio
 from .util import get_market_data
 from .risk_util import run_monte_carlo, VaR, CVaR, get_asset_return_data
+from .stress_test_util import run_stress_test
 
 
 LIQ_THRESHOLD = 0.1
@@ -144,7 +145,6 @@ def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
     var = VaR(simulations)
     cvar = CVaR(simulations)
 
-    # TODO: Add some kind of market exposure ex how the portfolio moves with BTC
     return {
         "asset_returns": asset_returns,
         "aggregated_return": aggregated_return,
@@ -154,8 +154,13 @@ def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
 
 
 def calculate_stress_test_risk(portfolio, asset_data) -> dict:
-    # TODO: use different kind of stress test scenarios like BTC crash, DeFi crash, stablecoin crash etc
-    return {}
+    stress_test_scenarios = [0.1, 0.25, 0.5, 0.75]
+    scenario_output = {}
+
+    for scenario in stress_test_scenarios:
+        scenario_output[scenario] = run_stress_test(portfolio, asset_data, scenario)
+
+    return scenario_output
 
 
 def calculate_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> float:
@@ -177,3 +182,4 @@ def calculate_risk_score(structure_risk, liquidity_risk, risk_sensitivity) -> fl
     total_score = structure_score * 0.4 + liquidity_score * 0.4 + risk_sensitivity_score * 0.2
 
     return total_score * 100
+

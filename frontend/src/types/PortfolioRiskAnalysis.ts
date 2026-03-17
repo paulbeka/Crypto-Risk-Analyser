@@ -12,7 +12,12 @@ export type PortfolioRiskAnalysis = {
         p50_days: number;
         p90_days: number;
     };
-    risk_sensitivity: {};
+    risk_sensitivity: {
+        aggregated_return: number;
+        asset_returns: Record<string, number>;
+        var: number;
+        cvar: number;
+    };
     portfolio_value: number;
     risk_score: number;
     stress_test: number;
