@@ -241,7 +241,6 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
 
   const riskScore = clampPercent(riskResult.risk_score);
   const liquidityFlagged = clampPercent(liquidityRisk.low_liquidity_share);
-  const stressTest = clampPercent(riskResult.stress_test);
   const top1 = clampPercent(structureRisk.top1_concentration);
   const top3 = clampPercent(structureRisk.top3_concentration);
 
@@ -314,14 +313,6 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
             title="Liquidity Flagged"
             value={formatPercent(liquidityFlagged)}
             subtitle="Share of lower-liquidity positions"
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <StatCard
-            title="Stress Test"
-            value={formatPercent(stressTest)}
-            subtitle="Portfolio stress indicator"
           />
         </Grid>
 
@@ -443,13 +434,6 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
               </Box>
 
               <RiskProgress
-                label="Stress Test"
-                value={stressTest}
-                color="#f97316"
-                subtitle="Higher values indicate more severe portfolio sensitivity under stress assumptions."
-              />
-
-              <RiskProgress
                 label="Low Liquidity Share"
                 value={liquidityFlagged}
                 color="#22d3ee"
@@ -545,6 +529,10 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
         <StressTestModule riskResult={riskResult} />
 
       </Grid>
+
+      <div>
+        This is the recap of the portfolio risk [use an LLM here]
+      </div>
     </Box>
   );
 };

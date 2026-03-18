@@ -53,9 +53,9 @@ def calculate_portfolio_structure_risk(portfolio: list[Portfolio]) -> dict:
     hhi_index = sum(weight ** 2 for weight in weights)
 
     return {
-        "top1_concentration": top1_concentraion,
-        "top3_concentration": top3_concentration,
-        "hhi_index": hhi_index,
+        "top1_concentration": top1_concentraion * 100,
+        "top3_concentration": top3_concentration * 100,
+        "hhi_index": hhi_index * 100,
     }
 
 
@@ -88,7 +88,7 @@ def calculate_portfolio_liquidity_risk(portfolio: list[Portfolio], asset_data: d
     low_liquidity_share = sum(
         portfolio_weights[i]
         for i, value in enumerate(liquidity_values)
-        if value < LIQ_THRESHOLD
+        if value > LIQ_THRESHOLD
     )
 
     finite_days = [d for d in days_to_liquidate if np.isfinite(d)]
@@ -106,7 +106,7 @@ def calculate_portfolio_liquidity_risk(portfolio: list[Portfolio], asset_data: d
 
     return {
         "liquidity_ratio": liquidity_ratio,
-        "low_liquidity_share": low_liquidity_share,
+        "low_liquidity_share": low_liquidity_share * 100,
         "worst_position_days": worst_position_days,
         "weighted_avg_days": weighted_avg_days,
         "p50_days": p50_days,
