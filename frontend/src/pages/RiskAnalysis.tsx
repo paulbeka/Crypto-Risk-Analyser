@@ -26,6 +26,7 @@ import {
 } from 'recharts';
 import StatCard from "../components/StatCard";
 import PaperCard from "../components/PaperCard";
+import CustomButton from '../components/CustomButton';
 import { chartColors, dashboardBg, cardBg, borderColor, textPrimary, textSecondary } from '../theme/colors';
 import RiskSensitivityModule from "../components/modules/RiskSensitivityModule";
 import StressTestModule from "../components/modules/StressTestModule";
@@ -153,7 +154,11 @@ function RiskProgress({
 }
 
 
-const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
+const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: { 
+  portfolio: PortfolioEntry[],
+  setPortfolio: any,
+  setIsOnInput: any
+}) => {
   const [riskResult, setRiskResult] = useState<PortfolioRiskAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -257,6 +262,11 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
     { name: 'P90', value: Number(liquidityRisk.p90_days ?? 0) },
   ];
 
+  const runNewAnalysis = () => {
+    setIsOnInput(true);
+    setPortfolio([]);
+  }
+
   return (
     <Box
       sx={{
@@ -281,14 +291,10 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
           </Typography>
         </Box>
 
-        <Chip
-          label={`Assets: ${portfolio.length}`}
-          sx={{
-            color: textPrimary,
-            background: 'rgba(96,165,250,0.12)',
-            border: '1px solid rgba(96,165,250,0.25)',
-          }}
-        />
+        <CustomButton onClick={runNewAnalysis}>
+          Run New Analysis
+        </CustomButton>
+
       </Stack>
 
       <Grid container spacing={3}>
@@ -529,10 +535,18 @@ const RiskAnalysis = ({ portfolio }: { portfolio: PortfolioEntry[] }) => {
         <StressTestModule riskResult={riskResult} />
 
       </Grid>
+      
+      <br />
+      <br />
+      <br />
 
-      <div>
-        This is the recap of the portfolio risk [use an LLM here]
-      </div>
+      <Grid size={{ xs: 12, lg: 6 }}>
+        <PaperCard title="AI Assessment" minHeight={360}>
+          <Typography>
+            This is the recap of the portfolio risk [use an LLM here]
+          </Typography>
+        </PaperCard>
+      </Grid>
     </Box>
   );
 };

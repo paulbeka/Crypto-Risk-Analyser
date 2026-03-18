@@ -26,7 +26,11 @@ function App() {
   }
 
   return (
-    <RiskAnalysis portfolio={portfolio} />
+    <RiskAnalysis 
+      portfolio={portfolio}
+      setPortfolio={setPortfolio}
+      setIsOnInput={setIsOnInput}
+    />
   )
 }
 

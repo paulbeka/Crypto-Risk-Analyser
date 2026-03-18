@@ -131,7 +131,8 @@ def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
 
         mean_return = sum(returns) / len(returns)
 
-        asset_returns[asset.crypto] = mean_return
+        annualised_mean_return = (((1 + mean_return) ** 365) - 1) * 100
+        asset_returns[asset.crypto] = annualised_mean_return
 
         weight = asset.allocation / total_allocation
         weights.append(weight)
@@ -144,10 +145,11 @@ def calculate_portfolio_risk_sensitivity(portfolio, asset_data) -> dict:
     simulations = run_monte_carlo(weights, mean_returns, cov_matrix, portfolio_value)
     var = VaR(simulations)
     cvar = CVaR(simulations)
+    aggregated_return_annual = (1 + aggregated_return) ** 365 - 1
 
     return {
         "asset_returns": asset_returns,
-        "aggregated_return": aggregated_return,
+        "aggregated_return": aggregated_return_annual * 100,
         "var": var,
         "cvar": cvar
     }

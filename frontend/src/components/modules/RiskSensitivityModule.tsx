@@ -18,9 +18,13 @@ import {
   borderColor,
 } from "../../theme/colors";
 
+
 function formatNumber(value: number | undefined, digits = 4) {
-  if (!value) return "0";
-  return value.toFixed(digits);
+  if (value === undefined || value === null) return "0";
+
+  return Number(value.toFixed(digits)).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+  });
 }
 
 export default function RiskSensitivityModule({ riskResult }: RiskModuleProps) {
@@ -37,7 +41,7 @@ export default function RiskSensitivityModule({ riskResult }: RiskModuleProps) {
 
   return (
     <Grid size={{ xs: 12, lg: 6 }}>
-      <PaperCard title="Risk Sensitivity" minHeight={360}>
+      <PaperCard title="Returns" minHeight={360}>
         <Stack spacing={2.5}>
 
           <Box sx={{ height: 220 }}>
@@ -63,10 +67,10 @@ export default function RiskSensitivityModule({ riskResult }: RiskModuleProps) {
           <Grid container spacing={2}>
             <Grid size={{ xs: 4 }}>
               <Typography variant="body2" sx={{ color: textSecondary }}>
-                Aggregated Return
+                Yearly Return
               </Typography>
               <Typography variant="h6" sx={{ color: textPrimary }}>
-                {formatNumber(sensitivity.aggregated_return)}
+                {formatNumber(sensitivity.aggregated_return, 2)}%
               </Typography>
             </Grid>
 
@@ -75,7 +79,7 @@ export default function RiskSensitivityModule({ riskResult }: RiskModuleProps) {
                 VaR
               </Typography>
               <Typography variant="h6" sx={{ color: textPrimary }}>
-                {formatNumber(sensitivity.var,2)}
+                ${formatNumber(sensitivity.var,2)}
               </Typography>
             </Grid>
 
@@ -84,7 +88,7 @@ export default function RiskSensitivityModule({ riskResult }: RiskModuleProps) {
                 CVaR
               </Typography>
               <Typography variant="h6" sx={{ color: textPrimary }}>
-                {formatNumber(sensitivity.cvar,2)}
+                ${formatNumber(sensitivity.cvar, 2)}
               </Typography>
             </Grid>
           </Grid>

@@ -46,7 +46,7 @@ export default function StressTestModule({ riskResult }: RiskModuleProps) {
                 </Typography>
 
                 <Typography sx={{ color: textSecondary }}>
-                  Portfolio Loss: €{Math.abs(loss).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  Portfolio Loss: ${Math.abs(loss).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </Typography>
 
                 <Typography sx={{ color: textSecondary }}>
