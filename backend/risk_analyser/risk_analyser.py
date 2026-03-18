@@ -36,11 +36,22 @@ def calculate_portfolio_risk(portfolio: list[Portfolio]) -> dict:
 def calculate_portfolio_value(portfolio: list[Portfolio], asset_data: dict) -> float:
     total_value = 0
 
+    allocation_distribution = {}
+
     for asset in portfolio:
         latest_price = asset_data[asset.crypto]["prices"][-1]
-        total_value += latest_price * asset.allocation
+        value = latest_price * asset.allocation
 
-    return total_value
+        allocation_distribution[asset.crypto] = value
+        total_value += value
+
+    for asset in allocation_distribution:
+        allocation_distribution[asset] = (allocation_distribution[asset] / total_value) * 100
+
+    return {
+        "total_value": total_value,
+        "allocation_distribution": allocation_distribution
+    }
 
 
 def calculate_portfolio_structure_risk(portfolio: list[Portfolio]) -> dict:
