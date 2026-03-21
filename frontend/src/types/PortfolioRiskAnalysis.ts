@@ -18,7 +18,11 @@ export type PortfolioRiskAnalysis = {
         var: number;
         cvar: number;
     };
-    portfolio_value: number;
+    portfolio_value: {
+        total_value: number;
+        allocation_distribution: Record<string, number>;
+    };
+    sector_exposure: Record<string, number>;
     risk_score: number;
     stress_test: number;
 }

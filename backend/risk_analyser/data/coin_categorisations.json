@@ -1,0 +1,27 @@
+{
+  "stablecoins": [
+    "Tether",
+    "USD Coin",
+    "Dai",
+    "TrueUSD"
+  ],
+  "defi": [
+    "Uniswap",
+    "Aave",
+    "Compound",
+    "Maker"
+  ],
+  "l1": [
+    "Bitcoin",  
+    "Ethereum",
+    "Solana",
+    "Cardano",
+    "Avalanche"
+  ],
+  "memecoins": [
+    "Dogecoin",
+    "Shiba Inu",
+    "Pepe",
+    "Floki"
+  ]
+}

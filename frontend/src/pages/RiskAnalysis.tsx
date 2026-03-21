@@ -30,6 +30,7 @@ import CustomButton from '../components/CustomButton';
 import { chartColors, dashboardBg, cardBg, borderColor, textPrimary, textSecondary } from '../theme/colors';
 import RiskSensitivityModule from "../components/modules/RiskSensitivityModule";
 import StressTestModule from "../components/modules/StressTestModule";
+import CategoryDistributionModule from '../components/modules/CategoryDistributionModule';
 
 function formatCurrency(value: number | string | null | undefined): string {
   const num = Number(value ?? 0);
@@ -54,6 +55,20 @@ function formatNumber(value: number | string | null | undefined, digits = 2): st
   return num.toFixed(digits);
 }
 
+const formatDecimal = (value: number) => {
+  if (value === 0) return "0";
+
+  const abs = Math.abs(value);
+
+  if (abs < 1e-4) {
+    return value.toExponential(1);
+  }
+
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: 6,
+  });
+};
+
 function clampPercent(value: number | string | null | undefined, multiplyIfNeeded = false): number {
   const raw = Number(value ?? 0);
   if (!Number.isFinite(raw)) return 0;
@@ -65,11 +80,6 @@ function scoreColor(score: number): string {
   if (score < 35) return '#22c55e';
   if (score < 70) return '#f59e0b';
   return '#ef4444';
-}
-
-function normalizePortfolioWeight(weight: number): number {
-  if (!Number.isFinite(weight)) return 0;
-  return weight <= 1 ? weight * 100 : weight;
 }
 
 function CustomTooltip({
@@ -191,14 +201,16 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
     };
   }, [portfolio]);
 
-  const allocationData = useMemo(
-    () =>
-      (portfolio ?? []).map((entry) => ({
-        asset: entry.crypto,
-        weight: normalizePortfolioWeight(Number(entry.allocation)),
-      })),
-    [portfolio]
-  );
+  const allocationData = useMemo(() => {
+    if (!riskResult?.portfolio_value.allocation_distribution) return [];
+
+    return Object.entries(riskResult.portfolio_value.allocation_distribution).map(
+      ([asset, value]) => ({
+        asset,
+        weight: Number(value),
+      })
+    );
+  }, [riskResult]);
 
   const totalAllocation = useMemo(
     () => allocationData.reduce((sum, item) => sum + item.weight, 0),
@@ -301,7 +313,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
             title="Portfolio Value"
-            value={formatCurrency(riskResult.portfolio_value)}
+            value={formatCurrency(riskResult.portfolio_value.total_value)}
             subtitle="Estimated USD value"
           />
         </Grid>
@@ -327,7 +339,12 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
             <Box sx={{ height: 260 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={allocationData} layout="vertical" margin={{ top: 8, right: 12, left: 8, bottom: 8 }}>
-                  <XAxis type="number" tick={{ fill: textSecondary }} domain={[0, 'dataMax']} />
+                  <XAxis
+                    type="number"
+                    domain={[0, 100]}
+                    ticks={[0, 25, 50, 75, 100]}
+                    tick={{ fill: textSecondary }}
+                  />
                   <YAxis
                     type="category"
                     dataKey="asset"
@@ -495,7 +512,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={liquidityDaysChartData} margin={{ top: 8, right: 12, left: 8, bottom: 8 }}>
                     <XAxis dataKey="name" tick={{ fill: textSecondary }} />
-                    <YAxis tick={{ fill: textSecondary }} />
+                    <YAxis tick={{ fill: textSecondary }} tickFormatter={formatDecimal} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="value" radius={[8, 8, 0, 0]}>
                       {liquidityDaysChartData.map((entry, index) => (
@@ -534,19 +551,37 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
 
         <StressTestModule riskResult={riskResult} />
 
+        <CategoryDistributionModule data={riskResult.sector_exposure} />
+
       </Grid>
-      
+
       <br />
       <br />
       <br />
 
       <Grid size={{ xs: 12, lg: 6 }}>
-        <PaperCard title="AI Assessment" minHeight={360}>
-          <Typography>
-            This is the recap of the portfolio risk [use an LLM here]
+        <PaperCard title="Portfolio Description">
+          <Typography sx={{ color: textPrimary, lineHeight: 1.7 }}>
+            Your portfolio is valued at <strong>{formatCurrency(riskResult.portfolio_value.total_value)}</strong> with an overall risk score of <strong>{formatNumber(riskScore, 0)}/100</strong>, indicating a{' '}
+            <strong>{riskScore < 35 ? 'low' : riskScore < 70 ? 'moderate' : 'high'}</strong> risk profile.
+
+            <br /><br />
+
+            Concentration remains a key driver of risk, with the top position accounting for <strong>{formatPercent(top1)}</strong> and the top three positions for <strong>{formatPercent(top3)}</strong>, suggesting{' '}
+            <strong>{top3 > 60 ? 'significant concentration' : 'reasonable diversification'}</strong> across holdings.
+
+            <br /><br />
+
+            Liquidity conditions show that <strong>{formatPercent(liquidityFlagged)}</strong> of the portfolio may be harder to exit quickly, with a weighted average liquidation time of <strong>{formatNumber(liquidityRisk.weighted_avg_days)}</strong> days.
+
+            <br /><br />
+
+            Overall, the portfolio exhibits <strong>{liquidityFlagged > 40 || top3 > 70 ? 'elevated structural and liquidity risks' : 'balanced risk characteristics'}</strong>, and may benefit from{' '}
+            <strong>{top3 > 70 ? 'greater diversification' : liquidityFlagged > 40 ? 'improved liquidity allocation' : 'continued monitoring'}</strong>.
           </Typography>
         </PaperCard>
       </Grid>
+
     </Box>
   );
 };
