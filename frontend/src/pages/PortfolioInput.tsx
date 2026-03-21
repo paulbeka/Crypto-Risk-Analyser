@@ -94,7 +94,7 @@ const PortfolioInput: React.FC<PortfolioInputProps> = ({
       <Stack spacing={4}>
         <Box textAlign="center">
           <Typography variant="h4" fontWeight={700}>
-            Build Your Crypto Portfolio
+            Analyse Your Crypto Portfolio
           </Typography>
         </Box>
 
