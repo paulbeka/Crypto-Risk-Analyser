@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { PortfolioEntry } from '../App';
-import { submitPortfolio } from '../api/Api';
+import { submitPortfolio, submitAddress } from '../api/Api';
 import Grid from "@mui/material/Grid";
 import {
   Paper,
@@ -164,10 +164,12 @@ function RiskProgress({
 }
 
 
-const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: { 
+const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput, ethAddress, setEthAddress }: { 
   portfolio: PortfolioEntry[],
   setPortfolio: any,
-  setIsOnInput: any
+  setIsOnInput: any,
+  ethAddress: string,
+  setEthAddress: any
 }) => {
   const [riskResult, setRiskResult] = useState<PortfolioRiskAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -178,7 +180,12 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
     const run = async () => {
       try {
         setError(null);
-        const res = await submitPortfolio(portfolio);
+        let res;
+        if (ethAddress != "") {
+          res = await submitAddress(ethAddress);
+        } else {
+          res = await submitPortfolio(portfolio);
+        }
         if (isMounted) {
           setRiskResult(res);
         }
@@ -190,7 +197,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
       }
     };
 
-    if (portfolio.length > 0) {
+    if (portfolio.length > 0 || ethAddress != "") {
       run();
     } else {
       setRiskResult(null);
@@ -277,6 +284,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
   const runNewAnalysis = () => {
     setIsOnInput(true);
     setPortfolio([]);
+    setEthAddress("");
   }
 
   return (
@@ -294,6 +302,10 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput }: {
         spacing={2}
         sx={{ mb: 4 }}
       >
+        <Box style={{ background: "white", padding: "15px", borderRadius: "10px"}}>
+          <img src="/icon.png" alt="logo" style={{ width: "75px" }} />
+        </Box>
+
         <Box>
           <Typography variant="h4" sx={{ color: textPrimary, fontWeight: 800 }}>
             Wallet Risk Analytics

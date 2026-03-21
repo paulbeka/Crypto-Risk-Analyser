@@ -1,5 +1,5 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PortfolioInput from './pages/PortfolioInput';
 import RiskAnalysis from './pages/RiskAnalysis';
 
@@ -10,10 +10,9 @@ export interface PortfolioEntry {
 
 function App() {
 
-  const [portfolio, setPortfolio] = useState<PortfolioEntry[]>([
-    { crypto: "bitcoin", allocation: 1 }
-  ]);
-  const [isOnInput, setIsOnInput] = useState(false);
+  const [portfolio, setPortfolio] = useState<PortfolioEntry[]>([]);
+  const [ethAddress, setEthAddress] = useState<string>("");
+  const [isOnInput, setIsOnInput] = useState(true);
 
   if (isOnInput) {
     return (
@@ -21,6 +20,8 @@ function App() {
         portfolio={portfolio}
         setPortfolio={setPortfolio}
         setIsOnInput={setIsOnInput}
+        ethAddress={ethAddress}
+        setEthAddress={setEthAddress}
       />
     );
   }
@@ -30,6 +31,8 @@ function App() {
       portfolio={portfolio}
       setPortfolio={setPortfolio}
       setIsOnInput={setIsOnInput}
+      ethAddress={ethAddress}
+      setEthAddress={setEthAddress}
     />
   )
 }

@@ -5,6 +5,7 @@ import requests
 
 from schemas import Portfolio
 from risk_analyser.risk_analyser import calculate_portfolio_risk
+from wallet_fetcher.wallet_fetcher import get_token_balances
 
 app = FastAPI(title="Crypto Portfolio Risk Checker")
 
@@ -24,10 +25,12 @@ app.add_middleware(
 COINGECKO_BASE = "https://api.coingecko.com/api/v3"
 
 
-# TODO: implement fetch from wallet chain
 @app.get("/wallet/{wallet_address}")
 def get_wallet_risk(wallet_address: str):
-  return {}
+  portfolio = get_token_balances(wallet_address)
+  portfolio = [Portfolio(**asset) if isinstance(asset, dict) else asset for asset in portfolio]
+  print(portfolio)
+  return calculate_portfolio_risk(portfolio)
 
 
 @app.post("/analyse")

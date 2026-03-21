@@ -25,6 +25,31 @@ export const submitPortfolio = async (portfolio: { crypto: string; allocation: n
 };
 
 
+export const submitAddress = async (address: string) => {
+  console.log(submitAddress);
+  try {
+    const response = await fetch(`${BASE_URL}/wallet/${address}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to submit portfolio");
+    }
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    return null;
+  }
+};
+
+
+
 export const getTickerSuggestions = async (query: string) => {
   if (!query || query.length < 2) return [];
 
