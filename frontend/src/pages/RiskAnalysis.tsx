@@ -176,12 +176,16 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput, ethAddress, setEt
 
   useEffect(() => {
     let isMounted = true;
+    let hasRun = false;
 
     const run = async () => {
+      if (hasRun) return;
+      hasRun = true;
+
       try {
         setError(null);
         let res;
-        if (ethAddress != "") {
+        if (ethAddress !== "") {
           res = await submitAddress(ethAddress);
         } else {
           res = await submitPortfolio(portfolio);
@@ -197,7 +201,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput, ethAddress, setEt
       }
     };
 
-    if (portfolio.length > 0 || ethAddress != "") {
+    if (portfolio.length > 0 || ethAddress !== "") {
       run();
     } else {
       setRiskResult(null);
@@ -206,7 +210,7 @@ const RiskAnalysis = ({ portfolio, setPortfolio, setIsOnInput, ethAddress, setEt
     return () => {
       isMounted = false;
     };
-  }, [portfolio]);
+  }, [portfolio, ethAddress]);
 
   const allocationData = useMemo(() => {
     if (!riskResult?.portfolio_value.allocation_distribution) return [];

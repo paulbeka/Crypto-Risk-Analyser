@@ -3,6 +3,8 @@ from schemas import Portfolio
 
 ALCHEMY_RPC_URL = "https://eth-mainnet.g.alchemy.com/v2/EN3K4upCaZZw4Ybws8RXu"
 
+COINGECKO_CACHE = {}
+
 
 def rpc_call(method, params):
     payload = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}
@@ -25,6 +27,31 @@ def get_eth_balance(address: str):
     return int(eth_balance_hex, 16) / 1e18
 
 
+def get_coingecko_id(contract_address: str):
+    contract_address = contract_address.lower()
+
+    if contract_address in COINGECKO_CACHE:
+        return COINGECKO_CACHE[contract_address]
+
+    url = f"https://api.coingecko.com/api/v3/coins/ethereum/contract/{contract_address}"
+
+    try:
+        r = requests.get(url, timeout=10)
+        if r.status_code != 200:
+            COINGECKO_CACHE[contract_address] = None
+            return None
+
+        data = r.json()
+        coin_id = data.get("id")
+
+        COINGECKO_CACHE[contract_address] = coin_id
+        return coin_id
+
+    except Exception:
+        COINGECKO_CACHE[contract_address] = None
+        return None
+
+
 def get_token_balances(address: str):
     data = rpc_call("alchemy_getTokenBalances", [address, "DEFAULT_TOKENS"])
 
@@ -32,10 +59,10 @@ def get_token_balances(address: str):
 
     eth_balance = get_eth_balance(address)
     if eth_balance > 0:
-        result.append({
-            "crypto": "ethereum",
-            "allocation": eth_balance
-        })
+        result.append(Portfolio(
+            crypto="ethereum",
+            allocation=eth_balance
+        ))
 
     for token in data["tokenBalances"]:
         raw_balance = int(token["tokenBalance"], 16)
@@ -51,10 +78,16 @@ def get_token_balances(address: str):
             continue
 
         decimals = metadata.get("decimals", 18)
-        name = metadata.get("name", "Unknown").lower()
-
         balance = raw_balance / (10 ** decimals)
 
-        result.append(Portfolio(crypto=name, allocation=balance))
+        coin_id = get_coingecko_id(contract)
+
+        if not coin_id:
+            continue 
+
+        result.append(Portfolio(
+            crypto=coin_id,
+            allocation=balance
+        ))
 
     return result
