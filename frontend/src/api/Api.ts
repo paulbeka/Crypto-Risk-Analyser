@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://209.38.197.38:8000";
 
 
 export const submitPortfolio = async (portfolio: { crypto: string; allocation: number }[]) => {

@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PortfolioInput from './pages/PortfolioInput';
 import RiskAnalysis from './pages/RiskAnalysis';
 

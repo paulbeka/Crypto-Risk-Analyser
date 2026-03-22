@@ -5,8 +5,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Cell,
-  LabelList,
+  Cell
 } from "recharts";
 import { Typography, Grid } from "@mui/material";
 import PaperCard from "../../components/PaperCard";
@@ -22,7 +21,6 @@ type Props = {
   data?: Record<string, number>;
 };
 
-// 👇 Map to nicer display names
 const CATEGORY_LABELS: Record<string, string> = {
   stablecoins: "Stablecoins",
   defi: "DeFi",
